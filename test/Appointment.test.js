@@ -1,22 +1,37 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Appointment } from '../src/Appointment';
+import { Appointment, AppointmentsDayView } from '../src/Appointment';
 
 describe('Appointment', () => {
+    let container;
+    let customer;
+    beforeEach(() => {
+        container = document.createElement('div');
+    })
+    const render = component => ReactDOM.render(component, container);
     it('renders the customer first name', () => {
-        const customer = { firstName: 'Ashley' };
-        const component = <Appointment customer={customer} />;
-        const container = document.createElement('div');
-        ReactDOM.render(component, container);
-
+        customer = { firstName: 'Ashley' };
+        render(<Appointment customer={customer} />, container);
         expect(container.textContent).toMatch('Ashley');
     });
     it('renders another customer first name', () => {
-        const customer = { firstName: 'Jordan' };
-        const component = <Appointment customer={customer} />;
-        const container = document.createElement('div');
-        ReactDOM.render(component, container);
-
+        customer = { firstName: 'Jordan' };
+        render(<Appointment customer={customer} />, container);
         expect(container.textContent).toMatch('Jordan');
+    });
+});
+
+describe('AppointmentsDayView', () => {
+    let container;
+
+    beforeEach(() => {
+        container = document.createElement('div');
+    });
+
+    const render = component => ReactDOM.render(component, container);
+
+    it('renders a div with rigt id', () => {
+        render(<AppointmentsDayView appointments={[]} />);
+        expect(container.querySelector('div#appointmentsDayView')).not.toBeNull();
     });
 });
