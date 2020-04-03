@@ -63,21 +63,21 @@ describe('CustomerForm', () => {
             });
             await ReactTestUtils.Simulate.submit(form('customer'));
         });
-        const itSubmitsNewValue = (fieldName, value) =>
+    const itSubmitsNewValue = (fieldName, value) =>
         it('saves new value when submitted', async () => {
-          expect.hasAssertions();
-          render(
-            <CustomerForm
-              {...{ [fieldName]: 'existingValue' }}
-              onSubmit={props =>
-                expect(props[fieldName]).toEqual(value)
-              }
-            />
-          );
-          await ReactTestUtils.Simulate.change(field(fieldName), {
-            target: { value }
-          });
-          await ReactTestUtils.Simulate.submit(form('customer'));
+            expect.hasAssertions();
+            render(
+                <CustomerForm
+                    {...{ [fieldName]: 'existingValue' }}
+                    onSubmit={props =>
+                        expect(props[fieldName]).toEqual(value)
+                    }
+                />
+            );
+            await ReactTestUtils.Simulate.change(field(fieldName), {
+                target: { value }
+            });
+            await ReactTestUtils.Simulate.submit(form('customer'));
         });
 
     describe('first name field', () => {
@@ -87,5 +87,21 @@ describe('CustomerForm', () => {
         itAssignsIdThatMatchesTheLabel('firstName');
         itSubmitExistingValue('firstName', 'value');
         itSubmitsNewValue('firstName', 'newValue');
+    });
+    describe('last name field', () => {
+        itRendersAsATextBox('lastName');
+        itIncludesTheExistingValue('lastName');
+        itRendersLabelALabel('lastName', 'Last name');
+        itAssignsIdThatMatchesTheLabel('lastName');
+        itSubmitExistingValue('lastName', 'value');
+        itSubmitsNewValue('lastName', 'newValue');
+    });
+    describe('phone field', () => {
+        itRendersAsATextBox('phone');
+        itIncludesTheExistingValue('phone');
+        itRendersLabelALabel('phone', 'Phone');
+        itAssignsIdThatMatchesTheLabel('phone');
+        itSubmitExistingValue('phone', 'value');
+        itSubmitsNewValue('phone', 'newValue');
     });
 });
