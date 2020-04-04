@@ -97,5 +97,14 @@ describe('AppointmentForm', () => {
             });
             await ReactTestUtils.Simulate.submit(form('appointment'));
           });
-    })
+    });
+
+    describe('time slot table', () => {
+        it('renders a table for time slots', () => {
+            render(<AppointmentForm />);
+            expect(
+                container.querySelector('table#time-slots')
+            ).not.toBeNull();
+        });
+    });
 });
