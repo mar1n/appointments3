@@ -187,5 +187,43 @@ describe('AppointmentForm', () => {
             );
             expect(startsAtField(0).checked).toEqual(true);
           });
+          it('saves existing value when submitted', async () => {
+            expect.hasAssertions();
+            render(
+              <AppointmentForm
+                availableTimeSlots={availableTimeSlots}
+                today={today}
+                startsAt={availableTimeSlots[0].startsAt}
+                onSubmit={({ startsAt }) =>
+                  expect(startsAt).toEqual(
+                    availableTimeSlots[0].startsAt
+                  )
+                }
+              />
+            );
+            ReactTestUtils.Simulate.submit(form('appointment'));
+          });
+          it('saves new value when submitted', () => {
+            expect.hasAssertions();
+            render(
+              <AppointmentForm
+                availableTimeSlots={availableTimeSlots}
+                today={today}
+                startsAt={availableTimeSlots[0].startsAt}
+                onSubmit={({ startsAt }) =>
+                  expect(startsAt).toEqual(
+                    availableTimeSlots[1].startsAt
+                  )
+                }
+              />
+            );
+            ReactTestUtils.Simulate.change(startsAtField(1), {
+              target: {
+                value: availableTimeSlots[1].startsAt.toString(),
+                name: 'startsAt'
+              }
+            });
+            ReactTestUtils.Simulate.submit(form('appointment'));
+          });
     });
 });
