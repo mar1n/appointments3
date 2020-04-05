@@ -10,6 +10,14 @@ const singleArgumentSpy = () => {
         receivedArgument: () => receivedArgument
     };
 };
+const spy = () => {
+    let receivedArguments;
+    return {
+        fn: (...args) => (receivedArguments = args),
+        receivedArguments: () => receivedArguments,
+        receivedArgument: n => receivedArguments[n]
+    };
+};
 describe('CustomerForm', () => {
     let render, container;
 
@@ -56,7 +64,7 @@ describe('CustomerForm', () => {
         });
     const itSubmitExistingValue = fieldName =>
         it('saves existing first name when submitted', async () => {
-            const submitSpy = singleArgumentSpy();
+            const submitSpy = spy();
             
             render(
                 <CustomerForm
@@ -65,8 +73,8 @@ describe('CustomerForm', () => {
                 />
             );
             await ReactTestUtils.Simulate.submit(form('customer'));
-            expect(submitSpy.receivedArgument()).toBeDefined();
-            expect(submitSpy.receivedArgument()[fieldName]).toEqual('value');
+            expect(submitSpy.receivedArguments()).toBeDefined();
+            expect(submitSpy.receivedArgument(0)[fieldName]).toEqual('value');
         });
     const itSubmitsNewValue = (fieldName, value) =>
         it('saves new value when submitted', async () => {
