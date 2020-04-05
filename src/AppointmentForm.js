@@ -43,20 +43,22 @@ const mergeDateAndTime = (date, timeSlot) => {
 const RadioButtonIfAvailable = ({
     availableTimeSlots,
     date,
-    timeSlot
+    timeSlot,
+    checkedTimeSlot
 }) => {
     const startsAt = mergeDateAndTime(date, timeSlot);
+    const isChecked = startsAt === checkedTimeSlot;
     if (
         availableTimeSlots.some(
             timeSlot => timeSlot.startsAt === startsAt
         )
     ) {
-        return <input name="startsAt" type="radio" value={startsAt} />;
+        return <input name="startsAt" type="radio" value={startsAt} checked={isChecked} readOnly />;
     }
     return null;
 };
 
-const TimeSlotTable = ({ salonOpensAt, salonClosesAt, today, availableTimeSlots }) => {
+const TimeSlotTable = ({ salonOpensAt, salonClosesAt, today, availableTimeSlots, checkedTimeSlot }) => {
     const dates = weeklyDateValues(today);
     const timeSlots = dailyTimeSlots(salonOpensAt, salonClosesAt);
     return (
@@ -79,6 +81,7 @@ const TimeSlotTable = ({ salonOpensAt, salonClosesAt, today, availableTimeSlots 
                                     availableTimeSlots={availableTimeSlots}
                                     date={date}
                                     timeSlot={timeSlot}
+                                    checkedTimeSlot={checkedTimeSlot}
                                 />
                             </td>
                         ))}
@@ -96,9 +99,13 @@ export const AppointmentForm = ({
     salonOpensAt,
     salonClosesAt,
     today,
-    availableTimeSlots
+    availableTimeSlots,
+    startsAt
 }) => {
-    const [appointment, setAppointment] = useState({ service });
+    const [appointment, setAppointment] = useState({
+        service,
+        startsAt
+      });
 
     const handleServiceChange = ({ target: { value } }) =>
         setAppointment(appointment => ({
@@ -124,6 +131,7 @@ export const AppointmentForm = ({
                 salonClosesAt={salonClosesAt}
                 today={today}
                 availableTimeSlots={availableTimeSlots}
+                checkedTimeSlot={appointment.startsAt}
             />
         </form>
     );

@@ -177,5 +177,15 @@ describe('AppointmentForm', () => {
               availableTimeSlots[1].startsAt.toString()
             );
           });
+          it('pre-selects the existing value', () => {
+            render(
+              <AppointmentForm
+                availableTimeSlots={availableTimeSlots}
+                today={today}
+                startsAt={availableTimeSlots[0].startsAt}
+              />
+            );
+            expect(startsAtField(0).checked).toEqual(true);
+          });
     });
 });
