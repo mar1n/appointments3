@@ -81,11 +81,9 @@ describe('CustomerForm', () => {
         });
     const itSubmitExistingValue = fieldName =>
         it('saves existing first name when submitted', async () => {
-            
             render(
                 <CustomerForm
                     {...{ [fieldName]: 'value' }}
-                    fetch={fetchSpy.fn}
                 />
             );
             await ReactTestUtils.Simulate.submit(form('customer'));
@@ -98,7 +96,6 @@ describe('CustomerForm', () => {
             render(
                 <CustomerForm
                     {...{ [fieldName]: 'existingValue' }}
-                    fetch={fetchSpy.fn}
                 />
             );
             await ReactTestUtils.Simulate.change(field(fieldName), {
@@ -144,7 +141,7 @@ describe('CustomerForm', () => {
     });
     it('calls fetch with the right properties when submitting data', async () => {
         render(
-            <CustomerForm fetch={fetchSpy.fn} onSubmit={() => {}} />
+            <CustomerForm onSubmit={() => {}} />
         );
         ReactTestUtils.Simulate.submit(form('customer'));
         expect(fetchSpy).toHaveBeenCalled();

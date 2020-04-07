@@ -19,7 +19,7 @@ export const CustomerForm = ({ firstName, lastName, phone, fetch }) => {
       phone: target.value
     }))
   const handleSubmit = () => {
-    fetch('/customers', {
+    window.fetch('/customers', {
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
@@ -56,8 +56,4 @@ export const CustomerForm = ({ firstName, lastName, phone, fetch }) => {
       value="Add"
     />
   </form>
-};
-
-CustomerForm.defaultProps = {
-  fetch: async () => {}
 };
