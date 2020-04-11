@@ -1,24 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import ReactTestUtils from 'react-dom/test-utils';
 import {
     Appointment,
     AppointmentsDayView
 } from '../src/AppointmentsDayView';
+import { createContainer } from './domManipulators';
 
 describe('Appointment', () => {
-    let container;
+    let render, container, element;
     let customer = {};
 
     beforeEach(() => {
-        container = document.createElement('div');
+        ({render, container, element } = createContainer());
     });
 
-    const render = component =>
-        ReactDOM.render(component, container);
-
     const appointmentTable = () =>
-        container.querySelector('#appointmentView > table');
+        element('#appointmentView > table');
 
     it('renders a table', () => {
         render(<Appointment customer={customer} />);
@@ -97,8 +94,8 @@ describe('Appointment', () => {
         render(
             <Appointment customer={customer} startsAt={timestamp} />
         );
-        expect(container.querySelector('h3')).not.toBeNull();
-        expect(container.querySelector('h3').textContent).toEqual(
+        expect(element('h3')).not.toBeNull();
+        expect(element('h3').textContent).toEqual(
             'Today’s appointment at 09:00'
         );
     });
@@ -116,36 +113,33 @@ describe('AppointmentsDayView', () => {
             customer: { firstName: 'Jordan' }
         }
     ];
-    let container;
+    let render, container, element, elements, click;
 
     beforeEach(() => {
-        container = document.createElement('div');
+        ({render, container, element, elements, click} = createContainer());
     });
-
-    const render = component =>
-        ReactDOM.render(component, container);
 
     it('renders a div with the right id', () => {
         render(<AppointmentsDayView appointments={[]} />);
         expect(
-            container.querySelector('div#appointmentsDayView')
+            element('div#appointmentsDayView')
         ).not.toBeNull();
     });
 
     it('renders multiple appointments in an ol element', () => {
         render(<AppointmentsDayView appointments={appointments} />);
-        expect(container.querySelector('ol')).not.toBeNull();
-        expect(container.querySelector('ol').children).toHaveLength(2);
+        expect(element('ol')).not.toBeNull();
+        expect(element('ol').children).toHaveLength(2);
     });
 
     it('renders each appointment in an li', () => {
         render(<AppointmentsDayView appointments={appointments} />);
-        expect(container.querySelectorAll('li')).toHaveLength(2);
+        expect(elements('li')).toHaveLength(2);
         expect(
-            container.querySelectorAll('li')[0].textContent
+            elements('li')[0].textContent
         ).toEqual('12:00');
         expect(
-            container.querySelectorAll('li')[1].textContent
+            elements('li')[1].textContent
         ).toEqual('13:00');
     });
 
@@ -163,31 +157,31 @@ describe('AppointmentsDayView', () => {
 
     it('has a button element in each li', () => {
         render(<AppointmentsDayView appointments={appointments} />);
-        expect(container.querySelectorAll('li > button')).toHaveLength(
+        expect(elements('li > button')).toHaveLength(
             2
         );
         expect(
-            container.querySelectorAll('li > button')[0].type
+            elements('li > button')[0].type
         ).toEqual('button');
     });
 
     it('renders another appointment when selected', () => {
         render(<AppointmentsDayView appointments={appointments} />);
-        const button = container.querySelectorAll('button')[1];
-        ReactTestUtils.Simulate.click(button);
+        const button = elements('button')[1];
+        click(button);
         expect(container.textContent).toMatch('Jordan');
     });
 
     it('adds toggled class to button when selected', () => {
         render(<AppointmentsDayView appointments={appointments} />);
-        const button = container.querySelectorAll('button')[1];
-        ReactTestUtils.Simulate.click(button);
+        const button = elements('button')[1];
+        click(button);
         expect(button.className).toMatch('toggled');
     });
 
     it('does not add toggled class if button is not selected', () => {
         render(<AppointmentsDayView appointments={appointments} />);
-        const button = container.querySelectorAll('button')[1];
+        const button = elements('button')[1];
         expect(button.className).not.toMatch('toggled');
     });
 });
