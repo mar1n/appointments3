@@ -4,11 +4,11 @@ import { createContainer, withEvent } from './domManipulators';
 import { CustomerForm } from '../src/CustomerForm';
 import { responseOkOf, requestBodyOf, responseErrorOf } from './spyHelpers';
 describe('CustomerForm', () => {
-  let render, container, form, field, labelFor, element, change, submit;
+  let render, container, form, field, labelFor, element, change, submit, blur;
   let fetchSpy;
-
+  
   beforeEach(() => {
-    ({ render, container, form, field, labelFor, element, change, submit } = createContainer());
+    ({ render, container, form, field, labelFor, element, change, submit, blur } = createContainer());
     fetchSpy = jest.fn(() => responseOkOf({}));
     window.fetch = fetchSpy;
     jest.spyOn(window, 'fetch').mockReturnValue(responseOkOf({}));
@@ -184,4 +184,15 @@ describe('CustomerForm', () => {
     itSubmitsExistingValue('phoneNumber', '12345');
     itSubmitsNewValue('phoneNumber', '67890');
   });
+  it('displays error after blur when first name field is blank', ()=> {
+
+      render(<CustomerForm />);
+
+      blur(
+        field('customer', 'firstName'),
+        withEvent('firstName', ' ')
+      );
+      expect(element('.error')).not.toBeNull();
+      expect(element('.error').textContent).toMatch('First name is required');
+    });
 });
