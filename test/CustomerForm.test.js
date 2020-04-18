@@ -3,6 +3,7 @@ import React from 'react';
 import { createContainer, withEvent } from './domManipulators';
 import { CustomerForm } from '../src/CustomerForm';
 import { responseOkOf, requestBodyOf, responseErrorOf } from './spyHelpers';
+import { act } from 'react-dom/test-utils';
 describe('CustomerForm', () => {
   let render, container, form, field, labelFor, element, change, submit, blur;
   let fetchSpy;
@@ -184,7 +185,8 @@ describe('CustomerForm', () => {
     itSubmitsExistingValue('phoneNumber', '12345');
     itSubmitsNewValue('phoneNumber', '67890');
   });
-  it('displays error after blur when first name field is blank', ()=> {
+  describe('Validation', () => {
+    it('displays error after blur when first name field is blank', ()=> {
 
       render(<CustomerForm />);
 
@@ -195,4 +197,18 @@ describe('CustomerForm', () => {
       expect(element('.error')).not.toBeNull();
       expect(element('.error').textContent).toMatch('First name is required');
     });
+    it('displays error after blur when last name field is blank', () => {
+      act(() => {
+        render(<CustomerForm />);
+        blur(
+          field('customer', 'lastName'),
+          withEvent('lastName', ' ')
+        );
+      });
+      expect(element('.error')).not.toBeNull();
+      expect(element('.error').textContent).toMatch(
+        'Last name is required'
+      );
+    });
+  })
 });
