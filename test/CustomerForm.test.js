@@ -19,13 +19,19 @@ describe('CustomerForm', () => {
     window.fetch.mockRestore();
   });
 
+  const validCustomer = {
+    firstName: 'first',
+    lastName: 'last',
+    phoneNumber: '123456789'
+  };
+
   it('renders a form', () => {
     render(<CustomerForm />);
     expect(form('customer')).not.toBeNull();
   });
 
   it('has a submit button', () => {
-    render(<CustomerForm />);
+    render(<CustomerForm {...validCustomer} />);
     const submitButton = element(
       'input[type="submit"]'
     );
@@ -33,7 +39,7 @@ describe('CustomerForm', () => {
   });
 
   it('calls fetch with the right properties when submitting data', async () => {
-    render(<CustomerForm />);
+    render(<CustomerForm {...validCustomer} />);
     submit(form('customer'));
     
     expect(window.fetch).toHaveBeenCalledWith(
@@ -51,7 +57,7 @@ describe('CustomerForm', () => {
     window.fetch.mockReturnValue(responseOkOf(customer));
     const saveSpy = jest.fn();
 
-    render(<CustomerForm onSave={saveSpy} />);
+    render(<CustomerForm {...validCustomer} onSave={saveSpy} />);
     await submit(form('customer'));
 
     expect(saveSpy).toHaveBeenCalledWith(customer);
@@ -61,7 +67,7 @@ describe('CustomerForm', () => {
     window.fetch.mockReturnValue(responseErrorOf());
     const saveSpy = jest.fn();
 
-    render(<CustomerForm onSave={saveSpy.fn} />);
+    render(<CustomerForm {...validCustomer} onSave={saveSpy.fn} />);
     await submit(form('customer'));
 
     expect(saveSpy).not.toHaveBeenCalled();
@@ -70,7 +76,7 @@ describe('CustomerForm', () => {
   it('prevents the default action when submitting the form', async () => {
     const preventDefaultSpy = jest.fn();
 
-    render(<CustomerForm />);
+    render(<CustomerForm {...validCustomer} />);
     await submit(form('customer'), {
         preventDefault: preventDefaultSpy
       });
@@ -82,7 +88,7 @@ describe('CustomerForm', () => {
   it('renders error message when fetch call fails', async () => {
     window.fetch.mockReturnValue(Promise.resolve({ ok: false }));
 
-    render(<CustomerForm />);
+    render(<CustomerForm {...validCustomer} />);
     await submit(form('customer'));
   
 
@@ -94,7 +100,7 @@ describe('CustomerForm', () => {
     window.fetch.mockReturnValueOnce(responseErrorOf());
     window.fetch.mockReturnValue(responseOkOf());
 
-    render(<CustomerForm />);
+    render(<CustomerForm {...validCustomer} />);
     await submit(form('customer'));
     await submit(form('customer'));
 
@@ -132,21 +138,21 @@ describe('CustomerForm', () => {
       expect(field('customer', fieldName).id).toEqual(fieldName);
     });
 
-  const itSubmitsExistingValue = fieldName =>
+  const itSubmitsExistingValue = (fieldName, value) =>
     it('saves existing value when submitted', async () => {
-      render(<CustomerForm {...{ [fieldName]: 'value' }} />);
+      render(<CustomerForm {...validCustomer} {...{ [fieldName]: value }} />);
 
       submit(form('customer'));
 
       expect(requestBodyOf(fetchSpy)).toMatchObject({
-        [fieldName]: 'value'
+        [fieldName]: value
       });
     });
 
   const itSubmitsNewValue = (fieldName, value) =>
     it('saves new value when submitted', async () => {
       render(
-        <CustomerForm {...{ [fieldName]: 'existingValue' }} />
+        <CustomerForm {...validCustomer} {...{ [fieldName]: 'existingValue' }} />
       );
       change(
         field('customer', fieldName),
@@ -158,6 +164,21 @@ describe('CustomerForm', () => {
         [fieldName]: value
       });
     });
+
+  it('does not submit the form when there are validation errors',
+  async () => {
+    render(<CustomerForm />);
+
+    await submit(form('customer'));
+    expect(window.fetch).not.toHaveBeenCalled();
+  })
+  it('renders validation errors after submission fails', async () =>
+  {
+    render(<CustomerForm />);
+    await submit(form('customer'));
+    expect(window.fetch).not.toHaveBeenCalled();
+    expect(element('.error')).not.toBeNull();
+  });
 
   describe('first name field', () => {
     itRendersAsATextBox('firstName');
