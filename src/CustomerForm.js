@@ -5,6 +5,16 @@ const required = description => value =>
     ? description
     : undefined;
 
+    const match = (re, description) => value =>
+      !value.match(re) ? description : undefined;
+
+  const list = (...validators) => value =>
+    validators.reduce(    
+      (result, validator) => 
+        result || validator(value),
+        undefined
+    );
+
 const Error = () => (
   <div className="error">An error occurred during save.</div>
 );
@@ -28,7 +38,14 @@ export const CustomerForm = ({
   const handleBlur = ({ target }) => {
     const validators = {
       firstName: required('First name is required'),
-      lastName: required('Last name is required')
+      lastName: required('Last name is required'),
+      phoneNumber: list(
+        required('Phone number is required'),
+        match(
+          /^[0-9+()\- ]*$/,
+          'Only numbers, spaces and these symbols are allowed: ( ) + -'
+        )
+      )
     };
     const result = validators[target.name](target.value);
     setValidationErrors({
@@ -103,8 +120,9 @@ export const CustomerForm = ({
         id="phoneNumber"
         value={phoneNumber}
         onChange={handleChange}
+        onBlur={handleBlur}
       />
-
+      {renderError('phoneNumber')}
       <input type="submit" value="Add" />
     </form>
   );
