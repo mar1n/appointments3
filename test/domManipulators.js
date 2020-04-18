@@ -27,7 +27,7 @@ export const createContainer = () => {
   const children = element => Array.from(element.childNodes);
 
   return {
-      render: component =>
+    render: component =>
       act(() => {
         ReactDOM.render(component, container);
       }),

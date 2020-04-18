@@ -11,16 +11,16 @@ export const list = (...validators) => value =>
   );
 
 export const validateMany = (validators, fields) =>
-    Object.entries(fields).reduce(
-      (result, [name, value]) => ({
-        ...result,
-        [name]: validators[name](value)
-      }),
-      {}
-    );
+  Object.entries(fields).reduce(
+    (result, [name, value]) => ({
+      ...result,
+      [name]: validators[name](value)
+    }),
+    {}
+  );
 
 export const hasError = (validationErrors, fieldName) =>
-    validationErrors[fieldName] !== undefined;
+  validationErrors[fieldName] !== undefined;
 
 export const anyErrors = errors =>
-    Object.values(errors).some(error => error !== undefined);
+  Object.values(errors).some(error => error !== undefined);
