@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+
 const CustomerRow = ({ customer }) => (
     <tr>
         <td>{customer.firstName}</td>
@@ -7,11 +8,21 @@ const CustomerRow = ({ customer }) => (
         <td />
     </tr>
 );
+
+const SearchButtons = ({ handleNext }) => (
+    <div className="button-bar">
+        <button role="button" id="next-page" onClick={handleNext}>
+            Next
+        </button>
+    </div>
+)
+
 export const CustomerSearch = () => {
     const [customers, setCustomers] = useState([]);
+    const [queryString, setQueryString] = useState('');
     useEffect(() => {
         const fetchData = async () => {
-            const result = await window.fetch('/customers', {
+            const result = await window.fetch(`/customers${queryString}`, {
                 method: 'GET',
                 credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json' }
@@ -20,8 +31,17 @@ export const CustomerSearch = () => {
         };
 
         fetchData();
-    }, []);
+    }, [queryString]);
+
+    const handleNext = useCallback(async () => {
+        const after = customers[customers.length - 1].id;
+        const newQueryString = `?after=${after}`;
+        setQueryString(newQueryString);
+    }, [customers]);
+
     return (
+        <>
+        <SearchButtons handleNext={handleNext} />
         <table>
             <thead>
                 <tr>
@@ -36,7 +56,7 @@ export const CustomerSearch = () => {
                     <CustomerRow customer={customer} key={customer.id} />
                 ))}
             </tbody>
-
         </table>
+        </>
     );
 };
