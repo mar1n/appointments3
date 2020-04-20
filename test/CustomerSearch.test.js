@@ -3,6 +3,8 @@ import 'whatwg-fetch';
 import { createContainer, withEvent } from './domManipulators';
 import { CustomerSearch } from '../src/CustomerSearch';
 import { fetchResponseOk } from './spyHelpers';
+import { click } from './shallowHelpers';
+import { AppointmentFormLoader } from '../src/AppointmentFormLoader';
 
 const oneCustomer = [
   { id: 1, firstName: 'A', lastName: 'B', phoneNumber: '1' }
@@ -185,4 +187,5 @@ describe('CustomerSearch', () => {
       await renderAndWait(<CustomerSearch renderCustomerActions={actionSpy} />);
       expect(actionSpy).toHaveBeenCalledWith(oneCustomer[0]);
   });
+  
 });
