@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { createShallowRenderer } from './shallowHelpers';
 import { RouterButton } from '../src/RouterButton';
+import App, { MainScreen } from '../src/App';
 
 describe('RouterButton', () => {
     const pathname = '/path';

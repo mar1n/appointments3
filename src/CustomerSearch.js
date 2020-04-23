@@ -1,32 +1,6 @@
-import React, { useEffect, useState, useCallback } from 'react';
-
-const searchParams = (after, searchTerm) => {
-  let pairs = [];
-  if (after) {
-    pairs.push(`after=${after}`);
-  }
-  if (searchTerm) {
-    pairs.push(`searchTerm=${searchTerm}`);
-  }
-  if (pairs.length > 0) {
-    return `?${pairs.join('&')}`;
-  }
-  return '';
-};
-
-const SearchButtons = ({ handleNext, handlePrevious }) => (
-  <div className="button-bar">
-    <button
-      role="button"
-      id="previous-page"
-      onClick={handlePrevious}>
-      Previous
-    </button>
-    <button role="button" id="next-page" onClick={handleNext}>
-      Next
-    </button>
-  </div>
-);
+import React, { useEffect, useState } from 'react';
+import { objectToQueryString } from './objectToQueryString';
+import { SearchButtons } from './SearchButtons';
 
 const CustomerRow = ({ customer, renderCustomerActions }) => (
   <tr>
@@ -37,30 +11,31 @@ const CustomerRow = ({ customer, renderCustomerActions }) => (
   </tr>
 );
 
-export const CustomerSearch = ({ renderCustomerActions }) => {
+export const CustomerSearch = ({
+  renderCustomerActions,
+  lastRowIds,
+  searchTerm,
+  limit,
+  history,
+  location
+}) => {
   const [customers, setCustomers] = useState([]);
-  const [lastRowIds, setLastRowIds] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
 
-  const handleSearchTextChanged = ({ target: { value } }) =>
-    setSearchTerm(value);
-
-  const handleNext = useCallback(() => {
-    const currentLastRowId = customers[customers.length - 1].id;
-    setLastRowIds([...lastRowIds, currentLastRowId]);
-  }, [customers, lastRowIds]);
-
-  const handlePrevious = useCallback(
-    () => setLastRowIds(lastRowIds.slice(0, -1)),
-    [lastRowIds]
-  );
+  const handleSearchTextChanged = ({ target: { value } }) => {
+    const params = { limit, searchTerm: value };
+    history.push(location.pathname + objectToQueryString(params));
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       let after;
       if (lastRowIds.length > 0)
         after = lastRowIds[lastRowIds.length - 1];
-      const queryString = searchParams(after, searchTerm);
+      const queryString = objectToQueryString({
+        after,
+        searchTerm,
+        limit: limit === 10 ? '' : limit
+      });
 
       const result = await window.fetch(
         `/customers${queryString}`,
@@ -72,9 +47,8 @@ export const CustomerSearch = ({ renderCustomerActions }) => {
       );
       setCustomers(await result.json());
     };
-
     fetchData();
-  }, [lastRowIds, searchTerm]);
+  }, [lastRowIds, searchTerm, limit]);
 
   return (
     <React.Fragment>
@@ -84,8 +58,11 @@ export const CustomerSearch = ({ renderCustomerActions }) => {
         placeholder="Enter filter text"
       />
       <SearchButtons
-        handleNext={handleNext}
-        handlePrevious={handlePrevious}
+        customers={customers}
+        searchTerm={searchTerm}
+        limit={limit}
+        lastRowIds={lastRowIds}
+        pathname={location.pathname}
       />
       <table>
         <thead>
@@ -99,9 +76,9 @@ export const CustomerSearch = ({ renderCustomerActions }) => {
         <tbody>
           {customers.map(customer => (
             <CustomerRow
-                customer={customer}
-                key={customer.id}
-                renderCustomerActions={renderCustomerActions}
+              customer={customer}
+              key={customer.id}
+              renderCustomerActions={renderCustomerActions}
             />
           ))}
         </tbody>
@@ -110,7 +87,8 @@ export const CustomerSearch = ({ renderCustomerActions }) => {
   );
 };
 
-
 CustomerSearch.defaultProps = {
-    renderCustomerActions: () => {}
-}
+  renderCustomerActions: () => {},
+  searchTerm: '',
+  lastRowIds: []
+};
